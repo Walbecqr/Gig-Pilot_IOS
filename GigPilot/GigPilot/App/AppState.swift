@@ -21,4 +21,13 @@ final class AppState {
     var isAnyPlatformOnline: Bool {
         isDoorDashOnline || isUberEatsOnline
     }
+
+    func syncActiveProfile() {
+        guard let defaults = UserDefaults(suiteName: "group.com.gigpilot.app"),
+              let profile = activeFilterProfile else { return }
+        defaults.set(profile.minimumPayout,              forKey: "gp_min_payout")
+        defaults.set(profile.minimumPayPerMile,          forKey: "gp_min_ppm")
+        defaults.set(profile.minimumHourlyRate,          forKey: "gp_min_hr")
+        defaults.set(profile.maximumPickupDistanceMiles, forKey: "gp_max_dist")
+    }
 }

@@ -5,8 +5,7 @@ struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \FilterProfile.name) private var profiles: [FilterProfile]
-
-    private var vm: DashboardViewModel { DashboardViewModel(appState: appState) }
+    @State private var vm = DashboardViewModel()
 
     var body: some View {
         NavigationStack {
@@ -40,13 +39,13 @@ struct DashboardView: View {
                         name: "DoorDash",
                         color: Color(hex: "FF3008"),
                         isOnline: appState.isDoorDashOnline,
-                        action: { vm.toggleDoorDash() }
+                        action: { vm.toggleDoorDash(appState: appState) }
                     )
                     PlatformToggle(
                         name: "Uber Eats",
                         color: Color(hex: "06C167"),
                         isOnline: appState.isUberEatsOnline,
-                        action: { vm.toggleUberEats() }
+                        action: { vm.toggleUberEats(appState: appState) }
                     )
                 }
             }
@@ -60,12 +59,14 @@ struct DashboardView: View {
             VStack(spacing: 12) {
                 SectionHeader(title: "Current Shift")
 
-                if appState.currentShift != nil {
-                    HStack {
-                        StatTile(label: "Earned",  value: vm.shiftEarningsDisplay, accent: DesignSystem.acceptGreen)
-                        StatTile(label: "Orders",  value: vm.shiftOrdersDisplay,   accent: DesignSystem.textPrimary)
-                        StatTile(label: "Time",    value: vm.shiftDurationDisplay, accent: DesignSystem.textPrimary)
-                        StatTile(label: "Rate",    value: vm.shiftHourlyDisplay,   accent: DesignSystem.marginalAmber)
+                if let shift = appState.currentShift {
+                    TimelineView(.periodic(from: .now, by: 30)) { _ in
+                        HStack {
+                            StatTile(label: "Earned",  value: vm.shiftEarningsDisplay(for: shift),  accent: DesignSystem.acceptGreen)
+                            StatTile(label: "Orders",  value: vm.shiftOrdersDisplay(for: shift),    accent: DesignSystem.textPrimary)
+                            StatTile(label: "Time",    value: vm.shiftDurationDisplay(for: shift),  accent: DesignSystem.textPrimary)
+                            StatTile(label: "Rate",    value: vm.shiftHourlyDisplay(for: shift),    accent: DesignSystem.marginalAmber)
+                        }
                     }
                 } else {
                     Text("No active shift — start one in the Shift tab")

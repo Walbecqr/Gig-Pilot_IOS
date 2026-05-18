@@ -1,44 +1,32 @@
 import Foundation
-import SwiftData
 import Observation
 
 @Observable
 final class DashboardViewModel {
-    private let appState: AppState
 
-    init(appState: AppState) {
-        self.appState = appState
+    func shiftEarningsDisplay(for shift: Shift) -> String {
+        String(format: "$%.2f", shift.totalEarnings)
     }
 
-    var currentShift: Shift? { appState.currentShift }
-
-    var shiftEarningsDisplay: String {
-        guard let shift = appState.currentShift else { return "$0.00" }
-        return String(format: "$%.2f", shift.totalEarnings)
+    func shiftOrdersDisplay(for shift: Shift) -> String {
+        "\(shift.acceptedCount) / \(shift.orders.count)"
     }
 
-    var shiftOrdersDisplay: String {
-        guard let shift = appState.currentShift else { return "0" }
-        return "\(shift.acceptedCount) / \(shift.orders.count)"
-    }
-
-    var shiftDurationDisplay: String {
-        guard let shift = appState.currentShift else { return "0:00" }
+    func shiftDurationDisplay(for shift: Shift) -> String {
         let mins = shift.durationMinutes
         return String(format: "%d:%02d", mins / 60, mins % 60)
     }
 
-    var shiftHourlyDisplay: String {
-        guard let shift = appState.currentShift else { return "$0/hr" }
-        return String(format: "$%.0f/hr", shift.estimatedHourlyRate)
+    func shiftHourlyDisplay(for shift: Shift) -> String {
+        String(format: "$%.0f/hr", shift.estimatedHourlyRate)
     }
 
-    func toggleDoorDash() {
+    func toggleDoorDash(appState: AppState) {
         appState.isDoorDashOnline.toggle()
         if appState.isDoorDashOnline { DeepLinkService.openDoorDash() }
     }
 
-    func toggleUberEats() {
+    func toggleUberEats(appState: AppState) {
         appState.isUberEatsOnline.toggle()
         if appState.isUberEatsOnline { DeepLinkService.openUberEats() }
     }

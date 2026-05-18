@@ -22,8 +22,22 @@ struct GigPilotApp: App {
                 .modelContainer(sharedModelContainer)
                 .onAppear {
                     seedDefaultProfilesIfNeeded()
+                    restoreActiveShift()
                     appState.location.requestAuthorization()
+                    appState.syncActiveProfile()
                 }
+                .onChange(of: appState.activeFilterProfile?.id) { _, _ in
+                    appState.syncActiveProfile()
+                }
+        }
+    }
+
+    private func restoreActiveShift() {
+        let context = sharedModelContainer.mainContext
+        var descriptor = FetchDescriptor<Shift>(predicate: #Predicate { $0.isActive })
+        descriptor.fetchLimit = 1
+        if let active = try? context.fetch(descriptor).first {
+            appState.currentShift = active
         }
     }
 

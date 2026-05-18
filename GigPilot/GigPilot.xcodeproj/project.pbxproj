@@ -102,6 +102,8 @@
 		E0000000000000000000001C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E0000000000000000000001D /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		E0000000000000000000001E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E0000000000000000000001F /* GigPilot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GigPilot.entitlements; sourceTree = "<group>"; };
+		E00000000000000000000020 /* GigPilotNotificationExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GigPilotNotificationExtension.entitlements; sourceTree = "<group>"; };
 		P00000000000000000000001 /* GigPilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GigPilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		P00000000000000000000002 /* GigPilotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GigPilotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		P00000000000000000000003 /* GigPilotNotificationExtension.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = GigPilotNotificationExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -162,6 +164,7 @@
 				G0000000000000000000000B /* Shared */,
 				G0000000000000000000000C /* Resources */,
 				G0000000000000000000000F /* Preview Content */,
+				E0000000000000000000001F /* GigPilot.entitlements */,
 			);
 			path = GigPilot;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 			children = (
 				E00000000000000000000018 /* NotificationService.swift */,
 				E0000000000000000000001B /* Info.plist */,
+				E00000000000000000000020 /* GigPilotNotificationExtension.entitlements */,
 			);
 			path = GigPilotNotificationExtension;
 			sourceTree = "<group>";
@@ -605,6 +609,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GigPilot/GigPilot.entitlements";
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGNING_ALLOWED = YES;
@@ -633,6 +638,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GigPilot/GigPilot.entitlements";
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGNING_ALLOWED = YES;
@@ -692,6 +698,7 @@
 		C00000000000000000000020 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GigPilotNotificationExtension/GigPilotNotificationExtension.entitlements";
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGNING_ALLOWED = YES;
@@ -716,6 +723,7 @@
 		C00000000000000000000021 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GigPilotNotificationExtension/GigPilotNotificationExtension.entitlements";
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGNING_ALLOWED = YES;
