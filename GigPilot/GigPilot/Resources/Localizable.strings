@@ -1,0 +1,26 @@
+/* GigPilot Localizable Strings */
+
+/* Dashboard */
+"dashboard.title" = "GigPilot";
+"dashboard.platforms" = "Platforms";
+"dashboard.current_shift" = "Current Shift";
+"dashboard.no_shift" = "No active shift — start one in the Shift tab";
+"dashboard.active_profile" = "Active Filter Profile";
+
+/* Offer Evaluator */
+"evaluator.title" = "Evaluate Offer";
+"evaluator.payout" = "Payout ($)";
+"evaluator.distance" = "Distance (mi)";
+"evaluator.duration" = "Est. Minutes";
+"evaluator.score_button" = "SCORE IT";
+
+/* Shift Tracker */
+"shift.start" = "Start Shift";
+"shift.end" = "End Shift";
+"shift.log_order" = "Log Order";
+"shift.no_orders" = "No orders logged yet";
+
+/* Scoring */
+"scoring.accept" = "✅ ACCEPT";
+"scoring.decline" = "❌ DECLINE";
+"scoring.marginal" = "⚠️ MARGINAL";
