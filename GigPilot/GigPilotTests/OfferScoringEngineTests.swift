@@ -90,6 +90,21 @@ final class OfferScoringEngineTests: XCTestCase {
         XCTAssertTrue(result.isMarginal, "Expected marginal (only $/hr fails), got: \(result.label) — \(result.reason)")
     }
 
+    func testMarginalWhenOnlyOrderTypeFails() {
+        // Profile accepts only .grocery; offer is .food → one soft failure → .marginal
+        // Numeric criteria all pass: $8/2mi/25min → $4/mi (>$1.50), $19.2/hr (>$15)
+        let groceryOnly = FilterProfile(
+            name: "Grocery Only",
+            minimumPayout: 5.0,
+            minimumPayPerMile: 1.5,
+            minimumHourlyRate: 15.0,
+            maximumPickupDistanceMiles: 10.0,
+            preferredOrderTypesJSON: "[\"grocery\"]"
+        )
+        let result = OfferScoringEngine.score(offer: offer(orderType: .food), against: groceryOnly)
+        XCTAssertTrue(result.isMarginal, "Expected marginal (only order type fails), got: \(result.label) — \(result.reason)")
+    }
+
     // MARK: – Voice Script
 
     func testVoiceScriptContainsPayoutForAccept() {
