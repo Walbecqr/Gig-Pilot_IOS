@@ -10,32 +10,21 @@ final class ShiftTrackerViewModel {
     var logPlatform: Platform = .doorDash
     var logWasAccepted: Bool = true
 
-    private let appState: AppState
-    private let modelContext: ModelContext
-
-    init(appState: AppState, modelContext: ModelContext) {
-        self.appState     = appState
-        self.modelContext = modelContext
-    }
-
-    var isShiftActive: Bool { appState.currentShift != nil }
-    var currentShift: Shift? { appState.currentShift }
-
-    func startShift() {
+    func startShift(context: ModelContext, appState: AppState) {
         let shift = Shift()
-        modelContext.insert(shift)
-        try? modelContext.save()
+        context.insert(shift)
+        try? context.save()
         appState.currentShift = shift
     }
 
-    func endShift() {
+    func endShift(context: ModelContext, appState: AppState) {
         appState.currentShift?.isActive = false
         appState.currentShift?.endTime = Date()
-        try? modelContext.save()
+        try? context.save()
         appState.currentShift = nil
     }
 
-    func logOrder() {
+    func logOrder(context: ModelContext, appState: AppState) {
         guard let shift = appState.currentShift else { return }
         let order = ShiftOrder(
             platform:            logPlatform.rawValue,
@@ -45,8 +34,8 @@ final class ShiftTrackerViewModel {
         )
         order.shift = shift
         shift.orders.append(order)
-        modelContext.insert(order)
-        try? modelContext.save()
+        context.insert(order)
+        try? context.save()
         resetLogForm()
         showLogOrderSheet = false
     }
@@ -61,9 +50,9 @@ final class ShiftTrackerViewModel {
     }
 
     private func resetLogForm() {
-        logPayout   = ""
-        logDistance = ""
-        logPlatform = .doorDash
+        logPayout      = ""
+        logDistance    = ""
+        logPlatform    = .doorDash
         logWasAccepted = true
     }
 }

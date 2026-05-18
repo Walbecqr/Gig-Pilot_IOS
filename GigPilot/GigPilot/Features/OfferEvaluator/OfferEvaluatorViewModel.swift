@@ -11,29 +11,20 @@ final class OfferEvaluatorViewModel {
     var scoringResult: ScoringResult?
     var scoredOffer: Offer?
 
-    private let appState: AppState
+    var canScore: Bool    { payoutValue > 0 }
+    var payoutValue:   Double { Double(payout)          ?? 0 }
+    var distanceValue: Double { Double(distanceMiles)   ?? 0 }
+    var durationValue: Double { Double(durationMinutes) ?? 0 }
 
-    init(appState: AppState) {
-        self.appState = appState
-    }
-
-    var canScore: Bool {
-        payoutValue > 0 && distanceValue >= 0
-    }
-
-    var payoutValue:    Double { Double(payout)          ?? 0 }
-    var distanceValue:  Double { Double(distanceMiles)   ?? 0 }
-    var durationValue:  Double { Double(durationMinutes) ?? 0 }
-
-    func score() {
-        guard let profile = appState.activeFilterProfile else { return }
+    func score(against profile: FilterProfile?, appState: AppState) {
+        guard let profile else { return }
 
         let offer = Offer(
-            platform:               selectedPlatform,
-            payout:                 payoutValue,
-            pickupDistanceMiles:    distanceValue,
+            platform:                selectedPlatform,
+            payout:                  payoutValue,
+            pickupDistanceMiles:     distanceValue,
             estimatedDurationMinutes: durationValue,
-            orderType:              selectedOrderType
+            orderType:               selectedOrderType
         )
 
         let result = OfferScoringEngine.score(offer: offer, against: profile)

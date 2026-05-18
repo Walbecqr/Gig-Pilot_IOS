@@ -3,35 +3,25 @@ import MapKit
 
 struct ZoneMapView: View {
     @Environment(AppState.self) private var appState
-    @State private var vm: ZoneMapViewModel?
-    @State private var position: MapCameraPosition = .region(ZoneMapViewModel.veroBeachRegion)
-
-    private func model() -> ZoneMapViewModel {
-        if let existing = vm { return existing }
-        let new = ZoneMapViewModel(appState: appState)
-        vm = new
-        return new
-    }
+    @State private var vm       = ZoneMapViewModel()
+    @State private var position = MapCameraPosition.region(ZoneMapViewModel.veroBeachRegion)
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 Map(position: $position) {
-                    ForEach(model().zones) { zone in
-                        MapCircle(
-                            center: zone.coordinate,
-                            radius: zone.radiusMeters
-                        )
-                        .foregroundStyle(zone.hotness.color.opacity(0.25))
-                        .stroke(zone.hotness.color, lineWidth: 2)
+                    ForEach(vm.zones) { zone in
+                        MapCircle(center: zone.coordinate, radius: zone.radiusMeters)
+                            .foregroundStyle(zone.hotness.color.opacity(0.25))
+                            .stroke(zone.hotness.color, lineWidth: 2)
 
                         Annotation(zone.name, coordinate: zone.coordinate) {
                             ZoneAnnotationView(zone: zone)
-                                .onTapGesture { model().tapZone(zone) }
+                                .onTapGesture { vm.tapZone(zone) }
                         }
                     }
 
-                    if let loc = model().currentLocation {
+                    if let loc = appState.location.currentLocation {
                         Annotation("You", coordinate: loc.coordinate) {
                             Circle()
                                 .fill(Color.blue)
@@ -49,12 +39,18 @@ struct ZoneMapView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(DesignSystem.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .sheet(isPresented: Binding(
-                get: { model().showZoneSheet },
-                set: { model().showZoneSheet = $0 }
-            )) {
-                if let zone = model().selectedZone {
-                    ZoneDetailSheet(zone: zone, onSelect: { model().setHotness($0, for: zone) })
+            .sheet(isPresented: $vm.showZoneSheet) {
+                if let zone = vm.selectedZone {
+                    ZoneDetailSheet(
+                        zone: zone,
+                        currentHotness: vm.zones.first(where: { $0.id == zone.id })?.hotness ?? .unknown,
+                        onSelect: { vm.setHotness($0, for: zone) }
+                    )
+                }
+            }
+            .onAppear {
+                if appState.location.authorizationStatus == .notDetermined {
+                    appState.location.requestAuthorization()
                 }
             }
         }
@@ -94,6 +90,7 @@ private struct ZoneAnnotationView: View {
 
 private struct ZoneDetailSheet: View {
     let zone: Zone
+    let currentHotness: ZoneHotness
     let onSelect: (ZoneHotness) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -121,7 +118,7 @@ private struct ZoneDetailSheet: View {
                                         .font(.headline)
                                         .foregroundStyle(DesignSystem.textPrimary)
                                     Spacer()
-                                    if zone.hotness == hotness {
+                                    if currentHotness == hotness {
                                         Image(systemName: "checkmark")
                                             .foregroundStyle(DesignSystem.acceptGreen)
                                     }

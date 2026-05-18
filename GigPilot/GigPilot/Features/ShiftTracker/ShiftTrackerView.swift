@@ -6,12 +6,9 @@ struct ShiftTrackerView: View {
     @Environment(\.modelContext)        private var modelContext
     @Query(sort: \Shift.startTime, order: .reverse) private var shifts: [Shift]
 
-    @State private var showExportSheet   = false
-    @State private var exportText        = ""
-
-    private var vm: ShiftTrackerViewModel {
-        ShiftTrackerViewModel(appState: appState, modelContext: modelContext)
-    }
+    @State private var vm             = ShiftTrackerViewModel()
+    @State private var showExportSheet = false
+    @State private var exportText      = ""
 
     var body: some View {
         NavigationStack {
@@ -35,11 +32,10 @@ struct ShiftTrackerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(DesignSystem.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .sheet(isPresented: Binding(
-                get: { vm.showLogOrderSheet },
-                set: { vm.showLogOrderSheet = $0 }
-            )) {
-                LogOrderSheet(vm: vm)
+            .sheet(isPresented: $vm.showLogOrderSheet) {
+                LogOrderSheet(vm: vm, onSave: {
+                    vm.logOrder(context: modelContext, appState: appState)
+                })
             }
             .sheet(isPresented: $showExportSheet) {
                 ShareSheet(text: exportText)
@@ -54,7 +50,7 @@ struct ShiftTrackerView: View {
             VStack(spacing: 12) {
                 if appState.currentShift != nil {
                     Button {
-                        vm.endShift()
+                        vm.endShift(context: modelContext, appState: appState)
                     } label: {
                         Label("End Shift", systemImage: "stop.circle.fill")
                             .font(.headline.weight(.bold))
@@ -74,7 +70,7 @@ struct ShiftTrackerView: View {
                     }
                 } else {
                     Button {
-                        vm.startShift()
+                        vm.startShift(context: modelContext, appState: appState)
                     } label: {
                         Label("Start Shift", systemImage: "play.circle.fill")
                             .font(.headline.weight(.bold))
@@ -94,10 +90,10 @@ struct ShiftTrackerView: View {
             VStack(spacing: 12) {
                 SectionHeader(title: "Live Stats")
                 HStack {
-                    StatTile2(label: "EARNED",    value: String(format: "$%.2f", shift.totalEarnings),    color: DesignSystem.acceptGreen)
-                    StatTile2(label: "ACCEPTED",  value: "\(shift.acceptedCount)",                        color: DesignSystem.textPrimary)
-                    StatTile2(label: "DECLINED",  value: "\(shift.declinedCount)",                        color: DesignSystem.declineRed)
-                    StatTile2(label: "EST $/HR",  value: String(format: "$%.0f", shift.estimatedHourlyRate), color: DesignSystem.marginalAmber)
+                    StatTile2(label: "EARNED",   value: String(format: "$%.2f", shift.totalEarnings),             color: DesignSystem.acceptGreen)
+                    StatTile2(label: "ACCEPTED",  value: "\(shift.acceptedCount)",                                 color: DesignSystem.textPrimary)
+                    StatTile2(label: "DECLINED",  value: "\(shift.declinedCount)",                                 color: DesignSystem.declineRed)
+                    StatTile2(label: "EST $/HR",  value: String(format: "$%.0f", shift.estimatedHourlyRate),       color: DesignSystem.marginalAmber)
                 }
             }
         }
@@ -110,7 +106,7 @@ struct ShiftTrackerView: View {
                     SectionHeader(title: "Orders This Shift")
                     Spacer()
                     Button {
-                        exportText = vm.csvExport(for: shift)
+                        exportText      = vm.csvExport(for: shift)
                         showExportSheet = true
                     } label: {
                         Image(systemName: "square.and.arrow.up")
@@ -138,12 +134,12 @@ struct ShiftTrackerView: View {
             VStack(spacing: 12) {
                 SectionHeader(title: "Last Shift")
                 HStack {
-                    StatTile2(label: "EARNED",   value: String(format: "$%.2f", shift.totalEarnings),    color: DesignSystem.acceptGreen)
-                    StatTile2(label: "ORDERS",   value: "\(shift.orders.count)",                          color: DesignSystem.textPrimary)
-                    StatTile2(label: "ACCEPT%",  value: String(format: "%.0f%%", shift.acceptanceRate * 100), color: DesignSystem.marginalAmber)
+                    StatTile2(label: "EARNED",  value: String(format: "$%.2f", shift.totalEarnings),             color: DesignSystem.acceptGreen)
+                    StatTile2(label: "ORDERS",  value: "\(shift.orders.count)",                                   color: DesignSystem.textPrimary)
+                    StatTile2(label: "ACCEPT%", value: String(format: "%.0f%%", shift.acceptanceRate * 100),      color: DesignSystem.marginalAmber)
                 }
                 Button {
-                    exportText = vm.csvExport(for: shift)
+                    exportText      = vm.csvExport(for: shift)
                     showExportSheet = true
                 } label: {
                     Label("Export CSV", systemImage: "square.and.arrow.up")
@@ -200,7 +196,8 @@ private struct OrderRow: View {
 }
 
 private struct LogOrderSheet: View {
-    let vm: ShiftTrackerViewModel
+    @Bindable var vm: ShiftTrackerViewModel
+    let onSave: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -209,16 +206,16 @@ private struct LogOrderSheet: View {
                 DesignSystem.background.ignoresSafeArea()
                 Form {
                     Section("Order Details") {
-                        Picker("Platform", selection: Binding(get: { vm.logPlatform }, set: { vm.logPlatform = $0 })) {
+                        Picker("Platform", selection: $vm.logPlatform) {
                             ForEach(Platform.allCases.filter { $0 != .unknown }, id: \.self) {
                                 Text($0.rawValue).tag($0)
                             }
                         }
-                        TextField("Payout ($)", text: Binding(get: { vm.logPayout }, set: { vm.logPayout = $0 }))
+                        TextField("Payout ($)", text: $vm.logPayout)
                             .keyboardType(.decimalPad)
-                        TextField("Distance (mi)", text: Binding(get: { vm.logDistance }, set: { vm.logDistance = $0 }))
+                        TextField("Distance (mi)", text: $vm.logDistance)
                             .keyboardType(.decimalPad)
-                        Toggle("Accepted", isOn: Binding(get: { vm.logWasAccepted }, set: { vm.logWasAccepted = $0 }))
+                        Toggle("Accepted", isOn: $vm.logWasAccepted)
                             .tint(DesignSystem.acceptGreen)
                     }
                 }
@@ -232,7 +229,7 @@ private struct LogOrderSheet: View {
                         .foregroundStyle(DesignSystem.textSecondary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { vm.logOrder() }
+                    Button("Save") { onSave() }
                         .foregroundStyle(DesignSystem.acceptGreen)
                         .disabled(vm.logPayout.isEmpty)
                 }

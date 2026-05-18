@@ -35,8 +35,10 @@ final class OfferScoringEngine {
 
         switch failures.count {
         case 0:
-            let summary = "$\(f2(offer.payout)) | $\(f2(ppm))/mi | ~$\(f0(hr))/hr"
-            return .accept(reason: summary)
+            var parts = ["$\(f2(offer.payout))"]
+            if ppm > 0  { parts.append("$\(f2(ppm))/mi") }
+            if hr  > 0  { parts.append("~$\(f0(hr))/hr") }
+            return .accept(reason: parts.joined(separator: " | "))
         case 1:
             return .marginal(reason: failures[0])
         default:

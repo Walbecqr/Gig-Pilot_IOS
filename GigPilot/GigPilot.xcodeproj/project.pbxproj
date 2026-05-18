@@ -162,7 +162,6 @@
 				G0000000000000000000000B /* Shared */,
 				G0000000000000000000000C /* Resources */,
 				G0000000000000000000000F /* Preview Content */,
-				E0000000000000000000001A /* Info.plist */,
 			);
 			path = GigPilot;
 			sourceTree = "<group>";
@@ -268,6 +267,7 @@
 		G0000000000000000000000C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E0000000000000000000001A /* Info.plist */,
 				E0000000000000000000001C /* Assets.xcassets */,
 				E0000000000000000000001D /* Localizable.strings */,
 			);

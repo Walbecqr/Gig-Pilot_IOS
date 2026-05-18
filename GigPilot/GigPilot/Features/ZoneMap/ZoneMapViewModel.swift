@@ -9,14 +9,6 @@ final class ZoneMapViewModel {
     var selectedZone: Zone?
     var showZoneSheet: Bool = false
 
-    private let appState: AppState
-
-    init(appState: AppState) {
-        self.appState = appState
-    }
-
-    var currentLocation: CLLocation? { appState.location.currentLocation }
-
     static let veroBeachRegion = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 27.6386, longitude: -80.3973),
         span: MKCoordinateSpan(latitudeDelta: 0.35, longitudeDelta: 0.35)
@@ -27,10 +19,11 @@ final class ZoneMapViewModel {
             zones[idx].hotness = hotness
         }
         showZoneSheet = false
+        selectedZone  = nil
     }
 
     func tapZone(_ zone: Zone) {
-        selectedZone = zone
+        selectedZone  = zone
         showZoneSheet = true
     }
 }
